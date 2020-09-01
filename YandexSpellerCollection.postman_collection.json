@@ -1,0 +1,296 @@
+{
+	"info": {
+		"_postman_id": "9a28a967-3464-4730-a295-f903f85c72c1",
+		"name": "YandexSpellerCollection",
+		"description": "Test collection as API homework.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ru",
+			"item": [
+				{
+					"name": "checkTextsCorrect",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f967d7a2-a03d-42c8-89e6-ade0c231e385",
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "text",
+									"value": "Текст без ошибок",
+									"type": "text"
+								},
+								{
+									"key": "lang",
+									"value": "ru",
+									"type": "text"
+								},
+								{
+									"key": "options",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "farmat",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}checkTexts",
+							"host": [
+								"{{baseUrl}}checkTexts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkTextsIncorrect",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5252fbe5-a876-4406-b2ef-03e32810fac0",
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Successful POST request\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Body matches contains error\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"error\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "text",
+									"value": "Ашибка сдесь",
+									"type": "text"
+								},
+								{
+									"key": "lang",
+									"value": "ru",
+									"type": "text"
+								},
+								{
+									"key": "options",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "farmat",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}checkTexts",
+							"host": [
+								"{{baseUrl}}checkTexts"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "en",
+			"item": [
+				{
+					"name": "checkTextIncorrect",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9454d493-412e-454a-8229-85d4dc4777f2",
+								"exec": [
+									"pm.variables.set(\"textVariable\", \"boook+saltyt\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "f3100ac8-56de-4d8d-9e3e-683ec10c5b3b",
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Body matches contains error\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"error\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}checkText?text={{textVariable}}&lang=en",
+							"host": [
+								"{{baseUrl}}checkText"
+							],
+							"query": [
+								{
+									"key": "text",
+									"value": "{{textVariable}}"
+								},
+								{
+									"key": "lang",
+									"value": "en"
+								},
+								{
+									"key": "options",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "farmat",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "checkTextCorrect",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6adf0fab-c235-41f0-bf68-4cfdb0aed5fd",
+								"exec": [
+									"pm.variables.set(\"textVariable\", '{{$randomWords}}');"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3a557886-2f78-48e3-85f9-ddc8c8c64ba4",
+								"exec": [
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(210);\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}checkText?text={{textVariable}}&lang=en",
+							"host": [
+								"{{baseUrl}}checkText"
+							],
+							"query": [
+								{
+									"key": "text",
+									"value": "{{textVariable}}"
+								},
+								{
+									"key": "lang",
+									"value": "en"
+								},
+								{
+									"key": "options",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "farmat",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
