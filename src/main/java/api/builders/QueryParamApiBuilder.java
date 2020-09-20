@@ -1,7 +1,10 @@
 package api.builders;
 
-public class QueryParamApiBuilder extends ApiBuilder {
+import java.util.Map;
 
+public class QueryParamApiBuilder {
+
+    protected Map<String,String> params;
     ApiBuilder parent;
     String suffix;
 
@@ -17,7 +20,6 @@ public class QueryParamApiBuilder extends ApiBuilder {
         return this;
     }
 
-    @Override
     public QueryParamApiBuilder setFields(String ...fields) {
         String value = "";
         for (String field : fields) {
@@ -26,6 +28,7 @@ public class QueryParamApiBuilder extends ApiBuilder {
         params.put(suffix + "_fields", value.substring(0,value.length()-1));
         return this;
     }
+
     public ApiBuilder buildQueryAndReturn() {
         return parent;
     }

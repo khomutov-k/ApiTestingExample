@@ -1,52 +1,42 @@
-import api.builders.ApiBuilder;
+import api.api.ListAPI;
 import beans.List;
-import io.restassured.http.Method;
 import org.testng.annotations.Test;
 import testData.ListConstants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class ListTest extends TestCommons{
 
     String objectSuffix = "1/lists";
-
+    ListAPI listAPI = new ListAPI();
     @Test
     public void getListDefault() {
-        String uriEnding = objectSuffix + "/" + testList.getId();
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .getBody().prettyPrint();
-        List listFromGet = gson.fromJson(body,List.class);
+        List listFromGet = new ListAPI().getListDefault(testList.getId());
         assertThat(listFromGet).isEqualTo(testList);
     }
 
     @Test
     public void updateList() {
-        String uriEnding = objectSuffix + "/" + testList.getId();
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setName(ListConstants.DESCRIPTION.value)
-                .build(Method.PUT, uriEnding)
-                .getBody().asString();
-        testList = gson.fromJson(body,List.class);
+        Map<String,String> updatedValues = new HashMap<String, String>();
+        updatedValues.put("name", ListConstants.DESCRIPTION.value);
+        testList = listAPI.updateList(testList.getId(),updatedValues);
         assertThat(testList.getName()).isEqualTo(ListConstants.DESCRIPTION.value);
     }
 
     @Test
     public void createCard() {
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setQueryParam("idList",testList.getId())
-                .build(Method.POST,"1/cards");
+        listAPI.createCard(testList.getId())
+                .then().body(notNullValue());
     }
 
     @Test
     public void getCards() {
-        String uriEnding = objectSuffix + "/" + testList.getId() + "/cards";
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .getBody().prettyPrint();
+        listAPI.getCards(testList.getId())
+                .then().body("name",contains(""));
     }
 }

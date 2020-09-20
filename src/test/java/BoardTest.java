@@ -1,96 +1,81 @@
+import api.api.BoardAPI;
 import api.builders.ApiBuilder;
 import beans.Board;
-import io.restassured.http.Method;
+import io.restassured.response.Response;
+import org.hamcrest.Matcher;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import testData.BoardConstants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class BoardTest extends TestCommons {
 
-    String objectSuffix = "/1/boards";
+    public static final Matcher<String> NOT_STARTWITH_CANNOT_GET = not(startsWith("Cannot GET"));
 
     @Test
     public void getBoardDefault() {
-        String uriEnding = objectSuffix + "/" + boardId;
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .getBody().prettyPrint();
-        Board board = gson.fromJson(body, Board.class);
+        Board board = new BoardAPI().getBoardById(boardId);
         assertThat(board.getName()).isEqualTo(testBoard.getName());
     }
 
     @Test
-    public void getBoardWithLists() {
-        String uriEnding = objectSuffix + "/" + boardId;
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .getListBuilder()
-                .buildQueryAndReturn()
-                .build(Method.GET, uriEnding)
-                .getBody().prettyPrint();
+    public void getBoardWithListsNotEmpty() {
+        Response response = new BoardAPI().getBoardWithLists(boardId);
+        response.prettyPrint();
+        response.then()
+                .spec(ApiBuilder.successResponse())
+                .body("lists", not(empty()));
+
     }
 
     @Test
     public void getBoardWithCards() {
-        String uriEnding = objectSuffix + "/" + boardId;
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .getCardBuilder()
-                .buildQueryAndReturn()
-                .build(Method.GET, uriEnding)
-                .getBody().prettyPrint();
+        new BoardAPI().getBoardWithCards(boardId)
+                .then()
+                .spec(ApiBuilder.successResponse())
+                .body("cards", notNullValue());
     }
 
     @Test
     public void updateBoard() {
-        String uriEnding = objectSuffix + "/" + boardId;
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setQueryParam("desc", BoardConstants.DESCRIPTION.value)
-                .build(Method.PUT, uriEnding)
-                .getBody().asString();
+        Map<String, String> updatedValues = new HashMap<String, String>();
+        updatedValues.put("desc", BoardConstants.DESCRIPTION.value);
+
+        String body = new BoardAPI()
+                .updateBoard(boardId, updatedValues)
+                .asString();
         testBoard = gson.fromJson(body, Board.class);
         assertThat(testBoard.getDesc()).isEqualTo(BoardConstants.DESCRIPTION.value);
     }
 
-    @Test(dataProvider = "fieldsProvider")
-    public void getField(String field) {
-        String uriEnding = objectSuffix + "/" + boardId + "/" + field;
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .prettyPrint();
-    }
-
     @Test
     public void getMemberships() {
-        String uriEnding = objectSuffix + "/" + boardId + "/memberships";
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setQueryParam("members", "all")
-                .build(Method.GET, uriEnding)
-                .prettyPrint();
+        new BoardAPI().getBoard(boardId, "/memberships")
+                .then().body(NOT_STARTWITH_CANNOT_GET);
     }
 
     @Test
     public void getCards() {
-        String uriEnding = objectSuffix + "/" + boardId + "/cards";
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .prettyPrint();
+        new BoardAPI().getBoard(boardId, "/cards")
+                .then().body(NOT_STARTWITH_CANNOT_GET);
     }
 
     @Test
     public void getLists() {
-        String uriEnding = objectSuffix + "/" + boardId + "/lists";
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.GET, uriEnding)
-                .prettyPrint();
+        new BoardAPI().getBoard(boardId, "/lists")
+                .then().body(NOT_STARTWITH_CANNOT_GET);
+    }
+
+    //  Bug in Trello docs was found
+    @Test(dataProvider = "fieldsProvider")
+    public void getField(String field) {
+        new BoardAPI().getField(boardId, field)
+                .then().body(NOT_STARTWITH_CANNOT_GET);
     }
 
     @DataProvider(name = "fieldsProvider")

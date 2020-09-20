@@ -1,12 +1,11 @@
-import api.builders.ApiBuilder;
+import api.api.BoardAPI;
+import api.api.ListAPI;
 import beans.Board;
 import beans.List;
 import com.google.gson.Gson;
-import io.restassured.http.Method;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import testData.BoardConstants;
-import testData.ListConstants;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -22,35 +21,20 @@ public class TestCommons {
 
     @BeforeClass
     public void createTestBoard() {
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setQueryParam("name", BoardConstants.NAME.value)
-                .build(Method.POST, boardSuffix)
-                .getBody().prettyPrint();
+        testBoard = new BoardAPI().createNewBoard(BoardConstants.NAME.value);
         gson = new Gson();
-        testBoard = gson.fromJson(body, Board.class);
         assertThat(testBoard).isNotNull();
         boardId = testBoard.getId();
     }
 
     @BeforeClass
     public void createTestList() {
-        String body = new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .setName(ListConstants.NAME.value)
-                .setParentBoard(boardId)
-                .build(Method.POST, listSuffix)
-                .getBody().prettyPrint();
-        testList = gson.fromJson(body, List.class);
+        testList = new ListAPI().createList(boardId);
     }
 
 
     @AfterClass(alwaysRun = true)
     public void deleteBoard() {
-        String uriEnding = boardSuffix + "/" + boardId;
-        new ApiBuilder()
-                .authorizeWithTokenAndKey()
-                .build(Method.DELETE, uriEnding)
-                .prettyPrint();
+        new BoardAPI().deleteBoardById(boardId);
     }
 }

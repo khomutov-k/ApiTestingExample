@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 //Builder pattern
-public class ApiBuilder {
+public class ApiBuilder implements IApiBuilder{
     protected Map<String,String> params = new HashMap<String, String>();
     private String baseUrl = "https://api.trello.com/";
+    private Method requestMethod = Method.GET;
+
     public ApiBuilder authorizeWithTokenAndKey() {
         params.put("key","80bd156d3b735dd62ae302a80a525105");
         params.put("token","82f3f75ea1fc434730c2b2f44607d41b6ea63ebd2a570c56b63dae7dac182576");
@@ -39,14 +41,13 @@ public class ApiBuilder {
         return this;
     }
 
-
     public ApiBuilder setQueryParam(String key,String value) {
         params.put(key,value);
         return this;
     }
 
-    public ApiBuilder setQuery(Map<String,String> cardsRelatedMap) {
-        params.putAll(cardsRelatedMap);
+    public ApiBuilder setQuery(Map<String,String> queryValues) {
+        params.putAll(queryValues);
         return this;
     }
 
@@ -60,15 +61,34 @@ public class ApiBuilder {
         return this;
     }
 
-    public Response build(Method method, String uriEnding) {
-        final Response response = RestAssured.given()
+    public ApiBuilder build() {
+        authorizeWithTokenAndKey();
+        return this;
+    }
+
+    public ApiBuilder build(Method method) {
+        authorizeWithTokenAndKey();
+        requestMethod = method;
+        return this;
+    }
+    public Response sendGetRequest(String uriEnding) {
+        return RestAssured.given()
                 .queryParams(params)
                 .baseUri(baseUrl)
                 .log().all()
                 .contentType(ContentType.JSON)
-                .request(method, uriEnding);
-        response.then().spec(successResponse());
-        return response;
+                .request(requestMethod, uriEnding)
+                .prettyPeek();
+    }
+
+    public Response sendRequest(String uriEnding) {
+        return RestAssured.given()
+                .queryParams(params)
+                .baseUri(baseUrl)
+                .log().all()
+                .contentType(ContentType.JSON)
+                .request(requestMethod, uriEnding)
+                .prettyPeek();
     }
 
     public static ResponseSpecification successResponse() {
