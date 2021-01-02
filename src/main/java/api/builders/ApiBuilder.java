@@ -19,8 +19,9 @@ public class ApiBuilder implements IApiBuilder{
     private Method requestMethod = Method.GET;
 
     public ApiBuilder authorizeWithTokenAndKey() {
-        params.put("key","80bd156d3b735dd62ae302a80a525105");
-        params.put("token","82f3f75ea1fc434730c2b2f44607d41b6ea63ebd2a570c56b63dae7dac182576");
+       //Add here your creds
+        params.put("key","");
+       params.put("token","");
         return this;
     }
 
